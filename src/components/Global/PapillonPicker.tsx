@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Platform, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 
 import { animPapillon, PapillonContextEnter, PapillonContextExit } from "@/utils/ui/animations";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import { Pressable } from "react-native-gesture-handler";
 import Reanimated, { LinearTransition, type AnimatedStyle } from "react-native-reanimated";
 import { NativeText } from "./NativeComponents";
@@ -21,6 +21,9 @@ export type PickerDataItem = string | {
   onPress?: () => {} | void,
   checked?: boolean,
   destructive?: boolean,
+  ios?: {
+    icon?: any
+  },
 } | null;
 
 type PickerData = PickerDataItem[];
@@ -84,13 +87,10 @@ const PapillonPicker: React.FC<PapillonPickerProps> = ({
             return {
               actionKey: "action-"+index.toString(),
               actionTitle: typeof item === "string" ? item : item.label,
-              // @ts-ignore
-              actionSubtitle: item.subtitle,
-              // @ts-ignore
-              menuState: (item.checked || item === selected) ? "on" : "off",
-              // @ts-ignore
-              menuAttributes: [item.destructive ? "destructive" : "normal"],
-              icon: {
+              actionSubtitle: typeof item !== "string" ? item.subtitle : undefined,
+              menuState: (typeof item !== "string" && (item.checked || item === selected)) ? "on" : "off",
+              menuAttributes: [typeof item !== "string" && item.destructive ? "destructive" : "normal"],
+              icon: typeof item !== "string" && item.ios?.icon ? item.ios.icon : {
                 type: typeof item !== "string" ? "IMAGE_SYSTEM" : "IMAGE_SYSTEM",
                 imageValue: {
                   systemName: typeof item !== "string" ? (item.sfSymbol ? item.sfSymbol : "") : "",

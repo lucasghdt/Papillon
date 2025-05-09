@@ -7,7 +7,7 @@ import {
 import { getSubjectData } from "@/services/shared/Subject";
 import { getCourseSpeciality } from "@/utils/format/format_cours_name";
 import { AverageDiffGrade, getAverageDiffGrade } from "@/utils/grades/getAverages";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import { Trophy, User, UserMinus, UserPlus, Users } from "lucide-react-native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { View, ScrollView } from "react-native";
@@ -226,7 +226,7 @@ const GradeSubjectScreen: Screen<"GradeSubject"> = ({ route, navigation }) => {
         })}
       </NativeList>
 
-      {averageDiff.without !== 0 && (
+      {averageDiff.without !== -1 && (
         <>
           <NativeListHeader label="Détails" />
 

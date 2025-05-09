@@ -1,4 +1,3 @@
-
 import {
   NativeItem,
   NativeList,
@@ -15,9 +14,9 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { Homework, HomeworkReturnType } from "@/services/shared/Homework";
+import { HomeworkReturnType } from "@/services/shared/Homework";
 import * as WebBrowser from "expo-web-browser";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import HTMLView from "react-native-htmlview";
 import { Screen } from "@/router/helpers/types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -35,10 +34,6 @@ import { getSubjectData } from "@/services/shared/Subject";
 import { useHomeworkStore } from "@/stores/homework";
 import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 
-const MemoizedNativeItem = React.memo(NativeItem);
-const MemoizedNativeList = React.memo(NativeList);
-const MemoizedNativeText = React.memo(NativeText);
-
 const HomeworksDocument: Screen<"HomeworksDocument"> = ({ navigation, route }) => {
   const theme = useTheme();
   const stylesText = StyleSheet.create({
@@ -55,20 +50,8 @@ const HomeworksDocument: Screen<"HomeworksDocument"> = ({ navigation, route }) =
   });
 
   const account = useCurrentAccount((store) => store.account!);
-  const localSubjects = account.personalization.subjects ?? {};
-  const [selectedPretty, setSelectedPretty] = useState(
-    Object.entries(localSubjects || {})[0]?.[1] ?? null
-  );
 
-  // Création de devoirs personnalisés
-  const [showCreateHomework, setShowCreateHomework] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [idHomework, setIdHomework] = useState(NaN);
-  const [contentHomework, setContentHomework] = useState<string | null>(null);
-  const [dateHomework, setDateHomework] = useState(Date.now());
-
-  const [homework, setHomework] = useState<Homework>(route.params.homework || {});
-
+  const homework = route.params.homework;
 
   const openUrl = (url: string) => {
     if (
@@ -205,8 +188,8 @@ const HomeworksDocument: Screen<"HomeworksDocument"> = ({ navigation, route }) =
                             useHomeworkStore
                               .getState()
                               .removeHomework(
-                                dateToEpochWeekNumber(new Date(dateHomework)),
-                                homework.id
+                                dateToEpochWeekNumber(new Date(homework.due)),
+                                homework.id,
                               );
                             navigation.goBack();
                           }

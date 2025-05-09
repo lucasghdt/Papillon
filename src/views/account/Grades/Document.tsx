@@ -1,7 +1,7 @@
 import React from "react";
 import { NativeItem, NativeList, NativeListHeader, NativeText, } from "@/components/Global/NativeComponents";
 import { getSubjectData } from "@/services/shared/Subject";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import * as StoreReview from "expo-store-review";
@@ -200,7 +200,7 @@ const GradeDocument: Screen<"GradeDocument"> = ({ route, navigation }) => {
         !grade.average.disabled && {
           icon: <School />,
           title: "Moyenne de la classe",
-          description: "Impact de la note sur la moyenne de la classe",
+          description: "Impact estimé sur la moyenne de la classe",
           value:
                         classDiff.difference === undefined
                           ? "???"

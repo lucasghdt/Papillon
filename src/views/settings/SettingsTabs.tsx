@@ -8,7 +8,7 @@ import {
 } from "@/components/Global/NativeComponents";
 import PapillonCheckbox from "@/components/Global/PapillonCheckbox";
 import { useCurrentAccount } from "@/stores/account";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import LottieView from "lottie-react-native";
 import {
   AlertTriangle,
@@ -510,6 +510,13 @@ const SettingsTabs = () => {
               icon={<Captions />}
               trailing={
                 <Switch
+                  trackColor={
+                    {
+                      false: theme.colors.border,
+                      true: theme.colors.primary
+                    }
+                  }
+                  thumbColor={theme.dark ? theme.colors.text : theme.colors.background}
                   value={!hideTabTitles}
                   onValueChange={() => {
                     setHideTabTitles(!hideTabTitles);
@@ -531,6 +538,13 @@ const SettingsTabs = () => {
               icon={<SendToBack />}
               trailing={
                 <Switch
+                  trackColor={
+                    {
+                      false: theme.colors.border,
+                      true: theme.colors.primary
+                    }
+                  }
+                  thumbColor={theme.dark ? theme.colors.text : theme.colors.background}
                   value={showTabBackground}
                   onValueChange={() => {
                     setShowTabBackground(!showTabBackground);

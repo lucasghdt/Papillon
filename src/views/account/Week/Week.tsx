@@ -4,7 +4,7 @@ import { Image, Linking, StyleSheet, Text, TouchableOpacity, View } from "react-
 import CalendarKit, { PackedAllDayEvent, PackedEvent, HeaderItemProps as CalendarKitHeaderItemProps, EventItem as CalendarKitEventItem } from "@howljs/calendar-kit";
 import { useCurrentAccount } from "@/stores/account";
 import { useTimetableStore } from "@/stores/timetable";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import { updateTimetableForWeekInCache } from "@/services/timetable";
 import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -131,7 +131,7 @@ const HeaderItem = memo<HeaderItemProps>(({ header }) => {
   const start = header.startUnix;
 
   const today = new Date();
-  today.setUTCHours(1, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
 
   const todayStamp = today.getTime();
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, Switch } from "react-native";
 import type { Screen } from "@/router/helpers/types";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import {
   CalendarCheck,
   BookCheck,
@@ -176,10 +176,13 @@ const SettingsNotifications: Screen<"SettingsNotifications"> = ({
                 entering={anim2Papillon(FadeInDown).delay(70 * index)}
                 trailing={
                   <Switch
-                    trackColor={{
-                      false: colors.border,
-                      true: colors.primary,
-                    }}
+                    trackColor={
+                      {
+                        false: colors.border,
+                        true: theme.colors.primary
+                      }
+                    }
+                    thumbColor={theme.dark ? colors.text : colors.background}
                     value={
                       account.personalization.notifications?.[
                         notification.personalizationValue as keyof typeof notifications

@@ -1,6 +1,6 @@
 import React from "react";
 import { ScrollView, Switch } from "react-native";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import type { Screen } from "@/router/helpers/types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 // Ensure this file contains valid regex patterns
@@ -29,6 +29,13 @@ const SettingsMagic: Screen<"SettingsMagic"> = ({ navigation }) => {
         <NativeItem
           trailing={
             <Switch
+              trackColor={
+                {
+                  false: colors.border,
+                  true: colors.primary
+                }
+              }
+              thumbColor={theme.dark ? colors.text : colors.background}
               value={account?.personalization?.MagicNews ?? false}
               onValueChange={(value) => mutateProperty("personalization", { MagicNews: value })}
             />
@@ -54,6 +61,13 @@ const SettingsMagic: Screen<"SettingsMagic"> = ({ navigation }) => {
         <NativeItem
           trailing={
             <Switch
+              trackColor={
+                {
+                  false: colors.border,
+                  true: colors.primary
+                }
+              }
+              thumbColor={theme.dark ? colors.text : colors.background}
               value={account?.personalization?.MagicHomeworks ?? false}
               onValueChange={(value) => mutateProperty("personalization", { MagicHomeworks: value })}
             />

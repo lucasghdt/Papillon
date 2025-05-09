@@ -1,6 +1,6 @@
 import React, {useRef, useState} from "react";
 import { Image, ScrollView, Switch, TextInput, View} from "react-native";
-import {useTheme} from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import type {Screen} from "@/router/helpers/types";
 import MultiServiceContainerCard from "@/components/Settings/MultiServiceContainerCard";
 import {NativeIcon, NativeItem, NativeList, NativeListHeader, NativeText} from "@/components/Global/NativeComponents";
@@ -152,6 +152,13 @@ const SettingsMultiService: Screen<"SettingsMultiService"> = ({ navigation }) =>
         <NativeItem
           trailing={
             <Switch
+              trackColor={
+                {
+                  false: theme.colors.border,
+                  true: theme.colors.primary
+                }
+              }
+              thumbColor={theme.dark ? theme.colors.text : theme.colors.background}
               value={multiServiceEnabled ?? false}
               onValueChange={() => {
                 if (multiServiceEnabled) {

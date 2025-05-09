@@ -6,7 +6,7 @@ import { NativeItem, NativeList, NativeText } from "@/components/Global/NativeCo
 import { useHomeworkStore } from "@/stores/homework";
 import { useCurrentAccount } from "@/stores/account";
 
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import { ActivityIndicator, Alert, Dimensions, Platform, TextInput, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import PapillonPicker from "@/components/Global/PapillonPicker";
@@ -14,6 +14,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { BookOpen, Calendar } from "lucide-react-native";
 import ButtonCta from "@/components/FirstInstallation/ButtonCta";
 import { dateToEpochWeekNumber } from "@/utils/epochWeekNumber";
+import { Homework } from "@/services/shared/Homework";
+import HomeworkItem from "./Atoms/Item";
 
 
 const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
@@ -26,7 +28,7 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
   );
 
   // Création de devoirs personnalisés
-  const [currentHw, setCurrentHw] = useState("");
+  const [currentHw, setCurrentHw] = useState<Homework | null>(null);
   const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [idHomework, setIdHomework] = useState(NaN);
@@ -35,16 +37,37 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
 
 
   useEffect(() => {
-    if(route.params?.hwid) {
+    if (route.params?.hwid) {
       const allHomeworks = Object.values(homeworks).flat();
       const homework = allHomeworks.find(hw => hw.id === route.params?.hwid);
-      if(homework) {
-        setSelectedPretty(localSubjects[homework.subject]);
-        setIdHomework(Number(homework.id));
+      if (homework) {
+        const THEpretty = Object.entries(localSubjects).find((element) => element[1].pretty === homework.subject);
+        if (THEpretty) setSelectedPretty(THEpretty[1]);
+        setIdHomework(parseInt(homework.id));
         setContentHomework(homework.content);
         setDateHomework(homework.due);
         setCurrentHw(homework);
       }
+    } else {
+      let createId: number = Math.floor(Math.random() * 100000 + 1);
+      let idAlreadyExist = useHomeworkStore
+        .getState()
+        .existsHomework(
+          dateToEpochWeekNumber(new Date(dateHomework)),
+          String(createId)
+        );
+
+      while (idAlreadyExist) {
+        createId = Math.floor(Math.random() * 100000 + 1);
+        idAlreadyExist = useHomeworkStore
+          .getState()
+          .existsHomework(
+            dateToEpochWeekNumber(new Date(dateHomework)),
+            String(createId)
+          );
+      }
+
+      setIdHomework(createId);
     }
   }, [route.params?.hwid]);
 
@@ -87,6 +110,8 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
   };
 
   const updateHomework = async () => {
+    if (!currentHw) return;
+
     const newHomework: Homework = {
       ...currentHw,
       subject: selectedPretty.pretty,
@@ -119,10 +144,41 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
     });
   }, [navigation, currentHw]);
 
+  const [exampleDone, setExampleDone] = useState(false);
+
   return (
     <ScrollView style={{
       paddingHorizontal: 12
     }}>
+      <NativeList inline>
+        <NativeItem>
+          <View style={{ marginHorizontal: -20, marginTop: -8, marginBottom: -10 }}>
+            <HomeworkItem
+              homework={{
+                attachments: [],
+                color: selectedPretty.color,
+                content: contentHomework ?? "Commence par ajouter du contenu",
+                done: exampleDone,
+                due: dateHomework,
+                id: String(idHomework),
+                personalizate: true,
+                subject: selectedPretty.pretty,
+                exam: false,
+              }}
+              contentOpacity={!contentHomework ? 0.5 : undefined}
+              index={idHomework}
+              key={idHomework}
+              // @ts-expect-error
+              navigation={navigation}
+              onDonePressHandler={() => {
+                setExampleDone(!exampleDone);
+              }}
+              total={1}
+            />
+          </View>
+        </NativeItem>
+      </NativeList>
+
       <NativeList inline>
         <NativeItem
           icon={<BookOpen size={22} strokeWidth={2} />}
@@ -143,6 +199,17 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
                   data={Object.entries(localSubjects).map(([key, subject]) => ({
                     label: subject.pretty,
                     onPress: () => setSelectedPretty(subject),
+                    checked: selectedPretty?.pretty === subject.pretty,
+                    ios: {
+                      icon: {
+                        type: "IMAGE_SYSTEM" ,
+                        imageValue: {
+                          systemName: "circle.fill",
+                          pointSize: 12,
+                          hierarchicalColor: subject?.color,
+                        },
+                      }
+                    }
                   }))}
                   selected={selectedPretty?.pretty}
                 >
@@ -214,8 +281,12 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
                 onChange={(_event, selectedDate) => {
                   setShowDatePicker(false);
                   if (selectedDate) {
-                    selectedDate.setHours(0, 0, 0, 0);
-                    setDateHomework(selectedDate.getTime());
+                    const dateSelected = Date.UTC(
+                      selectedDate.getFullYear(),
+                      selectedDate.getMonth(),
+                      selectedDate.getDate(),
+                    );
+                    setDateHomework(dateSelected);
                   }
                 }}
               />
@@ -258,7 +329,7 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
       <ButtonCta
         value={currentHw ? "Mettre à jour" : "Valider"}
         onPress={() => {
-          if(currentHw) {
+          if (currentHw) {
             updateHomework();
           } else {
             createHomework();
@@ -274,6 +345,7 @@ const AddHomeworkScreen: Screen<"AddHomework"> = ({ route, navigation }) => {
           alignSelf: "center",
           marginTop: 15,
         }}
+        backgroundColor={selectedPretty.color}
       />
     </ScrollView>
   );

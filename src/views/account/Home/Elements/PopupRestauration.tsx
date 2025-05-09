@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import { View, Image, StyleSheet } from "react-native";
 import { NativeList, NativeText } from "@/components/Global/NativeComponents";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ArrowUpRight } from "lucide-react-native";
 import { useCurrentAccount } from "@/stores/account";
@@ -19,7 +19,7 @@ const PopupRestauration: React.FC<PopupRestaurationProps> = ({ onImportance }) =
   const mutateProperty = useCurrentAccount(store => store.mutateProperty);
 
   const ImportanceHandler = () => {
-    let hours = new Date().getUTCHours();
+    let hours = new Date().getHours();
     if (hours >= 11 && hours < 14)
       onImportance(10);
     else

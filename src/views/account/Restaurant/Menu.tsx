@@ -9,7 +9,7 @@ import {
   Text,
   Dimensions
 } from "react-native";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import {
   AlertTriangle,
   BadgeX,
@@ -37,10 +37,9 @@ import Reanimated, { FadeIn, FadeInDown, FadeOut, LinearTransition, ZoomIn, Zoom
 import { reservationHistoryFromExternal } from "@/services/reservation-history";
 import { qrcodeFromExternal } from "@/services/qrcode";
 import { getMenu } from "@/services/menu";
-import type { FoodAllergen, FoodLabel, Menu as PawnoteMenu } from "pawnote";
 import { PapillonHeaderSelector } from "@/components/Global/PapillonModernHeader";
 import AnimatedNumber from "@/components/Global/AnimatedNumber";
-import { LessonsDateModal } from "../Lessons/LessonsHeader";
+import DateModal from "../../../components/Global/DateModal";
 import { BookingTerminal, BookingDay } from "@/services/shared/Booking";
 import { bookDayFromExternal, getBookingsAvailableFromExternal } from "@/services/booking";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
@@ -55,6 +54,8 @@ import { STORE_THEMES, StoreTheme } from "./Cards/StoreThemes";
 import MenuCard from "./Cards/Card";
 import { useAlert } from "@/providers/AlertProvider";
 import { ServiceCard } from "@/utils/external/restaurant";
+import { Menu as CanteenMenu } from "@/services/shared/Menu";
+import { FoodAllergen, FoodLabel } from "pawnote";
 
 const Menu: Screen<"Menu"> = ({ route, navigation }) => {
   const theme = useTheme();
@@ -70,10 +71,10 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
   const currentDate = new Date();
 
   const [allBookings, setAllBookings] = useState<BookingTerminal[] | null>(null);
-  const [currentMenu, setCurrentMenu] = useState<PawnoteMenu | null>(null);
+  const [currentMenu, setCurrentMenu] = useState<CanteenMenu | null>(null);
   const [currentWeek, setCurrentWeek] = useState<number>(0);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [pickerDate, setPickerDate] = React.useState(new Date(new Date().setUTCHours(1, 0, 0, 0)));
+  const [pickerDate, setPickerDate] = React.useState(new Date(new Date().setHours(0, 0, 0, 0)));
   const [isMenuLoading, setMenuLoading] = useState(false);
   const [isInitialised, setIsInitialised] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(0);
@@ -89,7 +90,7 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
   const getWeekNumber = (date: Date) => {
     const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
     const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getUTCDay() + 1) / 7);
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
   };
 
   const onDatePickerSelect = async (date?: Date) => {
@@ -99,7 +100,7 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
 
     const newDate = new Date(date);
 
-    newDate.setUTCHours(1, 0, 0, 0);
+    newDate.setHours(0, 0, 0, 0);
 
     if (newDate.valueOf() === pickerDate.valueOf()) {
       return;
@@ -124,9 +125,9 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
       setAllBookings(allBookings);
     }
 
-    const dailyMenu = account ? await getMenu(account, date).catch(() => null) : null;
+    const AliseAccount = linkedAccounts.find((account) => account.service === AccountService.Alise);
+    const dailyMenu = AliseAccount ? await getMenu(AliseAccount, pickerDate).catch(() => null) : account ? await getMenu(account, pickerDate).catch(() => null) : null;
     setCurrentMenu(dailyMenu);
-
     setMenuLoading(false);
   };
 
@@ -189,8 +190,8 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
           } */
         ];
         const newBookings: BookingTerminal[] = [];
-
-        const dailyMenu = account ? await getMenu(account, pickerDate).catch(() => null) : null;
+        const AliseAccount = linkedAccounts.find((account) => account.service === AccountService.Alise);
+        const dailyMenu = AliseAccount ? await getMenu(AliseAccount, pickerDate).catch(() => null) : account ? await getMenu(account, pickerDate).catch(() => null) : null;
         const accountPromises = linkedAccounts.map(async (account) => {
           try {
             if (!account || !account.service) {
@@ -424,7 +425,7 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                 >
                   <PressableScale
                     onPress={() => {
-                      onDatePickerSelect(new Date(pickerDate.setUTCDate(pickerDate.getUTCDate() - 1)));
+                      onDatePickerSelect(new Date(pickerDate.setDate(pickerDate.getDate() - 1)));
                       setRefreshCount(refreshCount + 1);
                     }}
                     activeScale={0.8}
@@ -456,7 +457,7 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                       </Reanimated.Text>
                     </Reanimated.View>
                   </Reanimated.View>
-                  <AnimatedNumber value={pickerDate.getUTCDate().toString()} style={[styles.weekPickerText, { color: theme.colors.text }]} />
+                  <AnimatedNumber value={pickerDate.getDate().toString()} style={[styles.weekPickerText, { color: theme.colors.text }]} />
                   <Reanimated.Text style={[styles.weekPickerText, { color: theme.colors.text }]} layout={animPapillon(LinearTransition)}>
                     {pickerDate.toLocaleDateString("fr-FR", { month: "long" })}
                   </Reanimated.Text>
@@ -468,7 +469,7 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                 >
                   <PressableScale
                     onPress={() => {
-                      onDatePickerSelect(new Date(pickerDate.setUTCDate(pickerDate.getUTCDate() + 1)));
+                      onDatePickerSelect(new Date(pickerDate.setDate(pickerDate.getDate() + 1)));
                       setRefreshCount(refreshCount + 1);
                     }}
                     activeScale={0.8}
@@ -539,7 +540,7 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                             { title: "Entrée", items: currentMenu.lunch.entry },
                             { title: "Plat", items: currentMenu.lunch.main },
                             { title: "Accompagnement", items: currentMenu.lunch.side },
-                            { title: "Fromage", items: currentMenu.lunch.fromage },
+                            { title: "Fromage", items: currentMenu.lunch.cheese },
                             { title: "Dessert", items: currentMenu.lunch.dessert },
                             { title: "Boisson", items: currentMenu.lunch.drink },
                           ].map(({ title, items }, index) =>
@@ -551,8 +552,8 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                                     <NativeText variant="title">
                                       {food.name ?? ""}
                                     </NativeText>
-                                    {renderAllergens(food.allergens)}
-                                    {renderLabels(food.labels)}
+                                    {renderAllergens(food.allergens ? food.allergens : [])}
+                                    {renderLabels(food.labels ? food.labels : [])}
                                   </React.Fragment>
                                 ))}
                               </NativeItem>
@@ -569,7 +570,7 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                             { title: "Entrée", items: currentMenu.dinner.entry },
                             { title: "Plat", items: currentMenu.dinner.main },
                             { title: "Accompagnement", items: currentMenu.dinner.side },
-                            { title: "Fromage", items: currentMenu.dinner.fromage },
+                            { title: "Fromage", items: currentMenu.dinner.cheese },
                             { title: "Dessert", items: currentMenu.dinner.dessert },
                             { title: "Boisson", items: currentMenu.dinner.drink },
                           ].map(({ title, items }, index) =>
@@ -581,8 +582,8 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                                     <NativeText variant="title">
                                       {food.name ?? ""}
                                     </NativeText>
-                                    {renderAllergens(food.allergens)}
-                                    {renderLabels(food.labels)}
+                                    {renderAllergens(food.allergens ? food.allergens : [])}
+                                    {renderLabels(food.labels ? food.labels : [])}
                                   </React.Fragment>
                                 ))}
                               </NativeItem>
@@ -645,11 +646,12 @@ const Menu: Screen<"Menu"> = ({ route, navigation }) => {
                   </View>
                 )}
               </>}
-            <LessonsDateModal
+            <DateModal
               showDatePicker={showDatePicker}
               setShowDatePicker={setShowDatePicker}
               currentDate={pickerDate}
               onDateSelect={onDatePickerSelect}
+              isHomework={false}
             />
           </>
         )}

@@ -71,7 +71,6 @@ export type RouteParameters = {
   UnivRennes1_Login: undefined;
   UnivRennes2_Login: undefined;
   UnivIUTLannion_Login: undefined;
-  UnivLimoges_Login: undefined;
   UnivSorbonneParisNord_login: undefined;
   UnivUphf_Login: undefined;
   BackgroundIdentityProvider: undefined;
@@ -84,9 +83,11 @@ export type RouteParameters = {
   SkolengoGeolocation: undefined;
   SkolengoInstanceSelector: { pos: CurrentPosition | null };
   SkolengoWebview: { school: SkolengoSchool };
+
   // account.index
   Home: undefined;
   HomeScreen?: { onboard: boolean };
+  CustomizeHeader: undefined;
 
   Lessons?: { outsideNav?: boolean };
   LessonsImportIcal: {
@@ -151,6 +152,10 @@ export type RouteParameters = {
   SettingsDonorsList: undefined;
   SettingsReactions: undefined;
   SettingsAccessibility: undefined;
+  SettingsGeneral: undefined;
+  SettingsPersonalization: undefined;
+  SettingsExperimental: undefined;
+  SettingsProject: undefined;
 
   Menu?: undefined;
   RestaurantQrCode: {

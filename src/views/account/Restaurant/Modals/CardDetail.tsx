@@ -7,7 +7,7 @@ import { NativeItem, NativeList, NativeText } from "@/components/Global/NativeCo
 import { differenceInDays, formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
 import { defaultProfilePicture } from "@/utils/ui/default-profile-picture";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import InsetsBottomView from "@/components/Global/InsetsBottomView";
 import { PressableScale } from "react-native-pressable-scale";
 import { useAccounts, useCurrentAccount } from "@/stores/account";
@@ -296,30 +296,31 @@ const RestaurantCardDetail: Screen<"RestaurantCardDetail"> = ({ route, navigatio
                 weight="light"
                 activeScale={0.95}
               >
-                <NativeList inline style={{ width: 100, height: 76 }}>
+                <NativeList inline style={{ width: 120, height: 76 }}>
                   <View
                     style={{
                       height: 76,
                       gap: 6,
                       flexDirection: "column",
                       alignItems: "center",
-                      justifyContent: "center"
+                      justifyContent: "center",
+                      backgroundColor: route.params.card.theme.colors.background ?? theme.colors.primary,
                     }}
                   >
                     <QrCode
                       size={24}
                       strokeWidth={2.2}
-                      color={theme.colors.text}
+                      color={"#fff"}
                     />
                     <Text
                       style={{
                         fontFamily: "semibold",
                         fontSize: 13,
-                        color: theme.colors.text,
+                        color: "#fff",
                         textAlign: "center",
                       }}
                     >
-                      QR-code
+                      Payer un repas
                     </Text>
                   </View>
                 </NativeList>

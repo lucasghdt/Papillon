@@ -27,14 +27,14 @@ export const getChats = async (account: PronoteAccount): Promise<Array<Chat>> =>
     }
 
     const today = new Date();
-    const todayIndex = today.getUTCDay();
+    const todayIndex = today.getDay();
     const dayName = parts[0].toLowerCase();
     const targetIndex = days.indexOf(dayName);
 
     if (targetIndex !== -1) {
       const diff = targetIndex - todayIndex;
       const targetDate = new Date();
-      targetDate.setUTCDate(today.getUTCDate() + (diff <= 0 ? diff : diff - 7));
+      targetDate.setDate(today.getDate() + (diff <= 0 ? diff : diff - 7));
       return targetDate;
     }
 

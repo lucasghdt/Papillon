@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState, useCallback, useMemo } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { useTheme } from "@react-navigation/native";
+import { usePapillonTheme as useTheme } from "@/utils/ui/theme";
 import { Calendar, Clock } from "lucide-react-native";
 
 import { WidgetProps } from "@/components/Home/Widget";
@@ -143,9 +143,9 @@ const NextCourseLesson: React.FC<{
 
       // Schedule next update at the start of the next minute
       const nextMinute = new Date(now);
-      nextMinute.setUTCSeconds(0);
-      nextMinute.setUTCMilliseconds(0);
-      nextMinute.setUTCMinutes(nextMinute.getUTCMinutes() + 1);
+      nextMinute.setSeconds(0);
+      nextMinute.setMilliseconds(0);
+      nextMinute.setMinutes(nextMinute.getMinutes() + 1);
       const delay = nextMinute.getTime() - now;
       return setTimeout(updateRemainingTime, delay);
     };
