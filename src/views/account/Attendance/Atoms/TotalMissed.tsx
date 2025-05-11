@@ -106,7 +106,7 @@ const TotalMissed = ({ totalMissed }: TotalMissedProps) => {
           </View>
           <NativeText
             style={{
-              color: theme.colors.text + "88",
+              color: (totalMissed.unJustified.hours > 0) ? "#D10000" : theme.colors.text + "88",
             }}
           >
             {totalMissed.unJustified.hours >= 2 ? "injustifiées" : "injustifiée"}
